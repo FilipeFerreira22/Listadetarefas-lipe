@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background-color: #1976D2;
+            transform: translateY(-2px);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+        
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        #tarefa {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        #tarefa:focus {
+            border-color: #2196F3;
+            outline: none;
+        }
+        
+        #data-vencimento, #categoria {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: white;
+            min-width: 150px;
+        }
+        
+        #adicionar {
+            padding: 12px 24px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            min-width: 120px;
+        }
+        
+        #adicionar:hover {
+            background-color: #1976D2;
+        }
+        
+        .filtros {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 25px 0;
+        }
+        
+        .filtros button {
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .filtros button:hover {
+            background-color: #dee2e6;
+        }
+        
+        .filtros button.ativo {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .ordenacao {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .ordenacao button {
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .ordenacao button:hover {
+            background-color: #dee2e6;
+        }
+        
+        .ordenacao button.ativo {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        ul {
+            list-style-type: none;
+            margin: 20px 0;
+        }
+        
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            border: 1px solid #e9ecef;
+        }
+        
+        li:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        li.completa {
+            background-color: #f8f9fa;
+            opacity: 0.8;
+        }
+        
+        .acoes {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .completar, .remover {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .completar {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .completar:hover {
+            background-color: #388E3C;
+        }
+        
+        .remover {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .remover:hover {
+            background-color: #d32f2f;
+        }
+        
+        .estatisticas {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .sumario {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .grafico {
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            margin-top: 15px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .barra {
+            flex: 1;
+            transition: height 0.5s;
+            border-radius: 4px;
+        }
+        
+        .data-criacao {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-left: 15px;
+            font-style: italic;
+        }
+        
+        .tarefa-vencida {
+            border-left: 4px solid #f44336;
+        }
+        
+        .categoria-pessoal {
+            border-left: 4px solid #4caf50;
+        }
+        
+        .categoria-trabalho {
+            border-left: 4px solid #2196F3;
+        }
+        
+        .categoria-estudos {
+            border-left: 4px solid #ff9800;
+        }
+        
+        .subtarefas {
+            margin-left: 20px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .subtarefa {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        .subtarefa.completa {
+            background-color: #f8f9fa;
+            opacity: 0.8;
+        }
+
+        .subtarefa-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        .subtarefa-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+
+        .subtarefa-input button {
+            padding: 8px 15px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .subtarefa-input button:hover {
+            background-color: #1976D2;
+        }
+
+        .adicionar-subtarefa-btn {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .adicionar-subtarefa-btn:hover {
+            background-color: #388E3C;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .input-row {
+                flex-direction: column;
+            }
+            
+            #tarefa, #data-vencimento, #categoria, #adicionar {
+                width: 100%;
+            }
+            
+            .filtros, .ordenacao {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filtros button, .ordenacao button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="comparacao-codigos.html" class="nav-link">Apresentação</a>
+        </div>
+        
+        <h1>Minha Lista de Tarefas</h1>
+        
+        <div class="input-container">
+            <div class="input-row">
+                <input type="text" id="tarefa" placeholder="Digite uma nova tarefa...">
+                <input type="date" id="data-vencimento">
+                <select id="categoria">
+                    <option value="pessoal">Pessoal</option>
+                    <option value="trabalho">Trabalho</option>
+                    <option value="estudos">Estudos</option>
+                </select>
+                <button id="adicionar">Adicionar</button>
+            </div>
+        </div>
+        
+        <div class="filtros">
+            <button id="todas" class="ativo">Todas</button>
+            <button id="ativas">Ativas</button>
+            <button id="completas">Completas</button>
+            <button id="pessoal">Pessoal</button>
+            <button id="trabalho">Trabalho</button>
+            <button id="estudos">Estudos</button>
+        </div>
+        
+        <div class="ordenacao">
+            <button id="ordenar-data">Ordenar por Data</button>
+            <button id="ordenar-texto">Ordenar por Ordem Alfabética </button>
+            <button id="ordenar-status">Ordenar por Status</button>
+        </div>
+        
+        <ul id="lista-tarefas">
+            <!-- Tarefas serão adicionadas aqui pelo JavaScript -->
+        </ul>
+        
+        <div class="estatisticas">
+            <div class="sumario" id="sumario">
+                Total de tarefas: 0 | Completas: 0 | Pendentes: 0
+            </div>
+            <div class="grafico" id="grafico">
+                <!-- Gráfico será gerado pelo JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Seleção de elementos do DOM
+        const tarefaInput = document.getElementById('tarefa');
+        const adicionarBtn = document.getElementById('adicionar');
+        const listaTarefas = document.getElementById('lista-tarefas');
+        const sumarioEl = document.getElementById('sumario');
+        const todasBtn = document.getElementById('todas');
+        const ativasBtn = document.getElementById('ativas');
+        const completasBtn = document.getElementById('completas');
+        const pessoalBtn = document.getElementById('pessoal');
+        const trabalhoBtn = document.getElementById('trabalho');
+        const estudosBtn = document.getElementById('estudos');
+        const ordenarDataBtn = document.getElementById('ordenar-data');
+        const ordenarTextoBtn = document.getElementById('ordenar-texto');
+        const ordenarStatusBtn = document.getElementById('ordenar-status');
+        
+        // Array para armazenar as tarefas
+        let tarefas = [];
+        let filtroAtual = 'todas';
+        
+        // Funções de gerenciamento de tarefas
+        function carregarTarefas() {
+            const tarefasSalvas = localStorage.getItem('tarefas');
+            if (tarefasSalvas) {
+                tarefas = JSON.parse(tarefasSalvas);
+                atualizarLista();
+            }
+        }
+        
+        function salvarTarefas() {
+            localStorage.setItem('tarefas', JSON.stringify(tarefas));
+        }
+        
+        function adicionarTarefa() {
+            const texto = tarefaInput.value.trim();
+            
+            if (texto === '') {
+                alert('Por favor, digite uma tarefa!');
+                return;
+            }
+            
+            const tarefa = {
+                id: Date.now(),
+                texto: texto,
+                completa: false,
+                dataCriacao: new Date(),
+                dataVencimento: document.getElementById('data-vencimento').value,
+                categoria: document.getElementById('categoria').value
+            };
+            
+            tarefas.push(tarefa);
+            tarefaInput.value = '';
+            document.getElementById('data-vencimento').value = '';
+            document.getElementById('categoria').value = 'pessoal';
+            
+            atualizarLista();
+            salvarTarefas();
+        }
+        
+        function completarTarefa(id) {
+            const tarefa = tarefas.find(item => item.id === id);
+            
+            if (tarefa) {
+                tarefa.completa = !tarefa.completa;
+                atualizarLista();
+                salvarTarefas();
+            }
+        }
+        
+        function removerTarefa(id) {
+            tarefas = tarefas.filter(item => item.id !== id);
+            atualizarLista();
+            salvarTarefas();
+        }
+        
+        // Funções de ordenação e filtragem
+        function mudarFiltro(filtro) {
+            filtroAtual = filtro;
+            
+            // Atualizar classes dos botões
+            todasBtn.classList.remove('ativo');
+            ativasBtn.classList.remove('ativo');
+            completasBtn.classList.remove('ativo');
+            pessoalBtn.classList.remove('ativo');
+            trabalhoBtn.classList.remove('ativo');
+            estudosBtn.classList.remove('ativo');
+            
+            if (filtro === 'todas') {
+                todasBtn.classList.add('ativo');
+            } else if (filtro === 'ativas') {
+                ativasBtn.classList.add('ativo');
+            } else if (filtro === 'completas') {
+                completasBtn.classList.add('ativo');
+            } else if (filtro === 'pessoal') {
+                pessoalBtn.classList.add('ativo');
+            } else if (filtro === 'trabalho') {
+                trabalhoBtn.classList.add('ativo');
+            } else if (filtro === 'estudos') {
+                estudosBtn.classList.add('ativo');
+            }
+            
+            atualizarLista();
+        }
+        
+        // Função principal de atualização da lista
+        function atualizarLista() {
+            listaTarefas.innerHTML = '';
+            
+            // Filtrar tarefas
+            let tarefasFiltradas = tarefas;
+            
+            if (filtroAtual === 'ativas') {
+                tarefasFiltradas = tarefas.filter(tarefa => !tarefa.completa);
+            } else if (filtroAtual === 'completas') {
+                tarefasFiltradas = tarefas.filter(tarefa => tarefa.completa);
+            } else if (filtroAtual === 'pessoal') {
+                tarefasFiltradas = tarefas.filter(tarefa => tarefa.categoria === 'pessoal');
+            } else if (filtroAtual === 'trabalho') {
+                tarefasFiltradas = tarefas.filter(tarefa => tarefa.categoria === 'trabalho');
+            } else if (filtroAtual === 'estudos') {
+                tarefasFiltradas = tarefas.filter(tarefa => tarefa.categoria === 'estudos');
+            }
+            
+            // Ordenar tarefas
+            if (ordenarDataBtn.classList.contains('ativo')) {
+                tarefasFiltradas.sort((a, b) => new Date(a.dataVencimento) - new Date(b.dataVencimento));
+            } else if (ordenarTextoBtn.classList.contains('ativo')) {
+                tarefasFiltradas.sort((a, b) => a.texto.localeCompare(b.texto));
+            } else if (ordenarStatusBtn.classList.contains('ativo')) {
+                tarefasFiltradas.sort((a, b) => a.completa - b.completa);
+            }
+            
+            // Criar elementos da lista
+            tarefasFiltradas.forEach(tarefa => {
+                const li = document.createElement('li');
+                if (tarefa.completa) {
+                    li.classList.add('completa');
+                }
+                
+                li.classList.add(`categoria-${tarefa.categoria}`);
+                
+                if (tarefa.dataVencimento && new Date(tarefa.dataVencimento) < new Date()) {
+                    li.classList.add('tarefa-vencida');
+                }
+                
+                li.innerHTML = `
+                    <span>${tarefa.texto}</span>
+                    ${ordenarDataBtn.classList.contains('ativo') ? `<span class="data-criacao">Criada em: ${new Date(tarefa.dataCriacao).toLocaleDateString()}</span>` : ''}
+                    <div class="acoes">
+                        <button class="completar">${tarefa.completa ? 'Reativar' : 'Completar'}</button>
+                        <button class="remover">Remover</button>
+                    </div>
+                `;
+                
+                const completarBtn = li.querySelector('.completar');
+                const removerBtn = li.querySelector('.remover');
+                
+                completarBtn.addEventListener('click', () => completarTarefa(tarefa.id));
+                removerBtn.addEventListener('click', () => removerTarefa(tarefa.id));
+                
+                // Adicionar subtarefas
+                if (tarefa.subtarefas && tarefa.subtarefas.length > 0) {
+                    const subtarefasDiv = document.createElement('div');
+                    subtarefasDiv.className = 'subtarefas';
+                    
+                    tarefa.subtarefas.forEach(subtarefa => {
+                        const subtarefaDiv = document.createElement('div');
+                        subtarefaDiv.className = `subtarefa ${subtarefa.completa ? 'completa' : ''}`;
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = subtarefa.completa;
+                        checkbox.onchange = () => completarSubtarefa(tarefa.id, subtarefa.id);
+                        
+                        const span = document.createElement('span');
+                        span.textContent = subtarefa.texto;
+                        
+                        const removerBtn = document.createElement('button');
+                        removerBtn.textContent = 'Remover';
+                        removerBtn.className = 'remover';
+                        removerBtn.onclick = () => removerSubtarefa(tarefa.id, subtarefa.id);
+                        
+                        subtarefaDiv.appendChild(checkbox);
+                        subtarefaDiv.appendChild(span);
+                        subtarefaDiv.appendChild(removerBtn);
+                        subtarefasDiv.appendChild(subtarefaDiv);
+                    });
+                    
+                    li.appendChild(subtarefasDiv);
+                }
+                
+                // Adicionar botão para adicionar subtarefa
+                const adicionarSubtarefaBtn = document.createElement('button');
+                adicionarSubtarefaBtn.textContent = 'Adicionar Subtarefa';
+                adicionarSubtarefaBtn.className = 'adicionar-subtarefa-btn';
+                adicionarSubtarefaBtn.onclick = () => {
+                    const subtarefaInput = adicionarSubtarefa(tarefa.id);
+                    li.appendChild(subtarefaInput);
+                };
+                
+                li.appendChild(adicionarSubtarefaBtn);
+                listaTarefas.appendChild(li);
+            });
+            
+            // Atualizar estatísticas
+            const total = tarefas.length;
+            const completas = tarefas.filter(t => t.completa).length;
+            const pendentes = total - completas;
+            
+            sumarioEl.textContent = `Total de tarefas: ${total} | Completas: ${completas} | Pendentes: ${pendentes}`;
+            atualizarGrafico();
+        }
+        
+        // Função de atualização do gráfico
+        function atualizarGrafico() {
+            const grafico = document.getElementById('grafico');
+            grafico.innerHTML = '';
+            
+            const total = tarefas.length;
+            const completas = tarefas.filter(t => t.completa).length;
+            const pendentes = total - completas;
+            
+            const barraCompletas = document.createElement('div');
+            barraCompletas.className = 'barra';
+            barraCompletas.style.height = `${(completas / total) * 100}%`;
+            barraCompletas.style.backgroundColor = '#4caf50';
+            
+            const barraPendentes = document.createElement('div');
+            barraPendentes.className = 'barra';
+            barraPendentes.style.height = `${(pendentes / total) * 100}%`;
+            barraPendentes.style.backgroundColor = '#f44336';
+            
+            grafico.appendChild(barraCompletas);
+            grafico.appendChild(barraPendentes);
+        }
+        
+        // Funções de subtarefas
+        function adicionarSubtarefa(tarefaId) {
+            const subtarefaInput = document.createElement('div');
+            subtarefaInput.className = 'subtarefa-input';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Nova subtarefa...';
+            
+            const botao = document.createElement('button');
+            botao.textContent = 'Adicionar';
+            botao.onclick = () => {
+                const texto = input.value.trim();
+                if (texto) {
+                    const tarefa = tarefas.find(t => t.id === tarefaId);
+                    if (!tarefa.subtarefas) {
+                        tarefa.subtarefas = [];
+                    }
+                    
+                    tarefa.subtarefas.push({
+                        id: Date.now(),
+                        texto: texto,
+                        completa: false
+                    });
+                    
+                    atualizarLista();
+                    salvarTarefas();
+                }
+            };
+            
+            subtarefaInput.appendChild(input);
+            subtarefaInput.appendChild(botao);
+            return subtarefaInput;
+        }
+        
+        function completarSubtarefa(tarefaId, subtarefaId) {
+            const tarefa = tarefas.find(t => t.id === tarefaId);
+            if (tarefa && tarefa.subtarefas) {
+                const subtarefa = tarefa.subtarefas.find(st => st.id === subtarefaId);
+                if (subtarefa) {
+                    subtarefa.completa = !subtarefa.completa;
+                    
+                    // Verificar se todas as subtarefas estão completas
+                    tarefa.completa = tarefa.subtarefas.every(st => st.completa);
+                    
+                    atualizarLista();
+                    salvarTarefas();
+                }
+            }
+        }
+        
+        function removerSubtarefa(tarefaId, subtarefaId) {
+            const tarefa = tarefas.find(t => t.id === tarefaId);
+            if (tarefa && tarefa.subtarefas) {
+                tarefa.subtarefas = tarefa.subtarefas.filter(st => st.id !== subtarefaId);
+                atualizarLista();
+                salvarTarefas();
+            }
+        }
+        
+        // Event Listeners
+        adicionarBtn.addEventListener('click', adicionarTarefa);
+        
+        tarefaInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                adicionarTarefa();
+            }
+        });
+        
+        todasBtn.addEventListener('click', () => mudarFiltro('todas'));
+        ativasBtn.addEventListener('click', () => mudarFiltro('ativas'));
+        completasBtn.addEventListener('click', () => mudarFiltro('completas'));
+        pessoalBtn.addEventListener('click', () => mudarFiltro('pessoal'));
+        trabalhoBtn.addEventListener('click', () => mudarFiltro('trabalho'));
+        estudosBtn.addEventListener('click', () => mudarFiltro('estudos'));
+        
+        ordenarDataBtn.addEventListener('click', () => {
+            ordenarDataBtn.classList.add('ativo');
+            ordenarTextoBtn.classList.remove('ativo');
+            ordenarStatusBtn.classList.remove('ativo');
+            atualizarLista();
+        });
+        
+        ordenarTextoBtn.addEventListener('click', () => {
+            ordenarTextoBtn.classList.add('ativo');
+            ordenarDataBtn.classList.remove('ativo');
+            ordenarStatusBtn.classList.remove('ativo');
+            atualizarLista();
+        });
+        
+        ordenarStatusBtn.addEventListener('click', () => {
+            ordenarStatusBtn.classList.add('ativo');
+            ordenarDataBtn.classList.remove('ativo');
+            ordenarTextoBtn.classList.remove('ativo');
+            atualizarLista();
+        });
+        
+        // Inicializar a aplicação
+        carregarTarefas();
+    </script>
+</body>
+</html>
